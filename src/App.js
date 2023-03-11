@@ -16,10 +16,19 @@
  */
 import React from 'react';
 import { Provider } from 'react-redux';
-import { Header, HeaderName } from 'carbon-components-react';
+import {
+  Header,
+  HeaderName,
+  HeaderGlobalBar,
+  HeaderGlobalAction,
+} from 'carbon-components-react';
+import { RiLogoutBoxRLine } from 'react-icons/ri';
+//require('dotenv').config();
 import VisualEditor from './nlp-visual-editor';
 
 import { store } from './redux/store';
+
+let appId_logout_pageUrl = process.env.APPID_LOGOUT_PAGE_URL;
 
 const App = () => (
   <Provider store={store}>
@@ -27,6 +36,16 @@ const App = () => (
       <HeaderName href="#" prefix="Elyra">
         Visual Editor for NLP rules
       </HeaderName>
+      <HeaderGlobalBar>
+        <HeaderGlobalAction
+          aria-label="Logout"
+          tooltipAlignment="end"
+          //onClick={action('app-switcher click')}
+          href="http://localhost:8080/appid/logout"
+        >
+          <RiLogoutBoxRLine size={20} />
+        </HeaderGlobalAction>
+      </HeaderGlobalBar>
     </Header>
     <VisualEditor />
   </Provider>
