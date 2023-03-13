@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { Provider } from 'react-redux';
+import VisualEditor from './nlp-visual-editor';
 import {
   Header,
   HeaderName,
@@ -23,12 +24,8 @@ import {
   HeaderGlobalAction,
 } from 'carbon-components-react';
 import { RiLogoutBoxRLine } from 'react-icons/ri';
-//require('dotenv').config();
-import VisualEditor from './nlp-visual-editor';
 
 import { store } from './redux/store';
-
-let appId_logout_pageUrl = process.env.APPID_LOGOUT_PAGE_URL;
 
 const App = () => (
   <Provider store={store}>
@@ -40,8 +37,7 @@ const App = () => (
         <HeaderGlobalAction
           aria-label="Logout"
           tooltipAlignment="end"
-          //onClick={action('app-switcher click')}
-          href="http://localhost:8080/appid/logout"
+          href="/appid/logout"
         >
           <RiLogoutBoxRLine size={20} />
         </HeaderGlobalAction>

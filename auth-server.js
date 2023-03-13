@@ -51,13 +51,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 passport.serializeUser((user, cb) => cb(null, user));
 passport.deserializeUser((user, cb) => cb(null, user));
+
 let appId_tenantId = process.env.APPID_TENANT_ID;
 let appId_clientId = process.env.APPID_CLIENT_ID;
 let appId_secret = process.env.APPID_SECRET;
 let appId_oauthServerUrl = process.env.APPID_OAUTH_SERVER_URL;
 let appId_redirectUri = process.env.APPID_REDIRECT_URI;
-let appId_success_redirectUrl = process.env.AUTH_SUCCESS_URL;
-let appId_logout_pageUrl = process.env.APPID_LOGOUT_PAGE_URL;
+const port = process.env.PORT || 8080;
+
+let user = {
+  name: '',
+  email: '',
+};
 
 passport.use(
   new WebAppStrategy({
@@ -84,30 +89,22 @@ app.get('/appid/callback', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 // Handle logout
 app.get('/appid/logout', function (req, res) {
   WebAppStrategy.logout(req);
-  res.redirect('/logout.html');
+  res.redirect('/');
 });
 
 // Protect the whole app
 app.use(passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 
-// Make sure only requests from an authenticated browser session can reach /api
-/* app.use('/api', (req, res, next) => {
-	if (req.user){
-		next();
-	} else {
-		res.status(401).send("Unauthorized");
-	}
-});*/
-
 // The /api/user API used to retrieve name of a currently logged in user
-/* app.get('/api/user', (req, res) => {
-	console.log(req.session[WebAppStrategy.AUTH_CONTEXT]);
-	res.json({
-		user: {
-			name: req.user.name
-		}
-	});
-});*/
+app.get('/api/user', (req, res) => {
+  console.log(req.session[WebAppStrategy.AUTH_CONTEXT]);
+  res.json({
+    user: {
+      name: req.user.name,
+      email: req.user.email,
+    },
+  });
+});
 // ----------------------- end of authentication setup
 
 app.use(express.static(path.join(__dirname, 'build')));
@@ -397,10 +394,18 @@ app.get(
   },
 );
 
+// --------------------- modify root access logic for auth-server
 app.get('/', function (req, res) {
+  // capture who the logged in user is
+  console.log(req.session[WebAppStrategy.AUTH_CONTEXT]);
+  if (req.user) {
+    user.name = req.user.name;
+    user.email = req.user.email;
+  }
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-app.listen(process.env.PORT || 8080, () => {
-  console.log('Listening on http://localhost:8080');
+app.listen(port, () => {
+  console.log('Auth-server is running, listening on port:', port);
 });
+// --------------------- end of change for auth-server
